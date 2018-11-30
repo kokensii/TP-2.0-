@@ -2,16 +2,10 @@ package tp.p2.Game;
 
 import java.util.Random;
 
-
-
-
-
-
-
+import tp.p2.Exceptions.CommandExecuteException;
 import tp.p2.Manager.SuncoinManager;
 import tp.p2.Manager.ZombieManager;
 import tp.p2.Plants.Plant;
-import tp.p2.Plants.PlantFactory;
 import tp.p2.PlantsVsZombies.Level;
 import tp.p2.Printer.DebugPrinter;
 import tp.p2.Printer.GamePrinter;
@@ -237,12 +231,23 @@ public class Game {
 	}
 	
 	
-	public void addPlantToGame(Plant planta, int x, int y){ 
-		planta.setX(x);
-		planta.setY(y);
-		planta.setGame(this);
-		plantList.add(planta);
-		managerSuns.restarSoles(planta.getCost());
+	public boolean addPlantToGame(Plant planta, int x, int y) throws CommandExecuteException{ 
+		boolean add = false;
+		if(isEmpty(x, y)){
+			if(comprobarSuns(x, y, planta)){	
+				planta.setX(x);
+				planta.setY(y);
+				planta.setGame(this);
+				plantList.add(planta);
+				managerSuns.restarSoles(planta.getCost());
+				add = true;
+			} else {
+				throw new CommandExecuteException("Failed to add " + planta.letra + ": not enough suncoins to buy it");
+			}
+		}else{
+			throw new CommandExecuteException("Failed to add " + planta.letra + ": position (" + planta.getX() + ", " + planta.getY() + ") is already occupied");
+		}
+		return add;
 	}
 	
 	public void computerAction() {
